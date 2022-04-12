@@ -1,0 +1,98 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: 'Roboto', sans-serif;
+}
+
+.barra-topo {
+    z-index: 1;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 22px;
+    height: 80px;
+    width: 100%;
+    background-color: #FFFFFF;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.05);
+}
+.logo {
+    height: 52px;
+    width: 74px;
+}
+.contatos {
+    height: 30px;
+    width: 42px;
+    color: #000000;
+    cursor: pointer;
+}
+
+.conteudo {
+    margin-top: 110px;
+    width: 100%;
+}
+.chat {
+    width: 100%;
+    list-style-type: none;
+}
+.mensagem {
+    padding: 12px 8px;
+    border-radius: 2px;
+    margin-bottom: 4px;
+    width: 100%;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 20px;
+}
+.mensagem-normal {
+    background-color: #FFFFFF;
+}
+.mensagem-reservada {
+    background-color: #FFDEDE;
+}
+.mensagem-de-status {
+    background-color: #DCDCDC;
+}
+.relogio {
+    color: #AAAAAA;
+}
+.usuario {
+    font-weight: bold;
+}
+
+.barra-inferior {
+    z-index: 1;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 22px;
+    height: 80px;
+    width: 100%;
+    background-color: #FFFFFF;
+    box-shadow: 0px -4px 6px rgba(0, 0, 0, 0.05);
+}
+.mensagem-enviada {
+    border: none;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 21px;
+    color: #000000;
+}
+.mensagem-enviada::placeholder {
+    font-style: italic;
+}
+.enviar {
+    font-size: 26px;
+    cursor: pointer;
+}
