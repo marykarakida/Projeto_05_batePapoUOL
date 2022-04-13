@@ -35,11 +35,12 @@ body {
 }
 
 .conteudo {
-    margin-top: 110px;
+    margin: 110px 0 80px;
     width: 100%;
 }
 .chat {
     width: 100%;
+    overflow-y: scroll;
     list-style-type: none;
 }
 .mensagem {
@@ -84,6 +85,8 @@ body {
 }
 .mensagem-enviada {
     border: none;
+    margin-right: 14px;
+    width: 100%;
     font-weight: 400;
     font-size: 18px;
     line-height: 21px;
