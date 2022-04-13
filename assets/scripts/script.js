@@ -16,14 +16,14 @@ function conferirNome() {
 
 // como mandar mensagem de saida
 function manterConexao() {
-    const mensagemEntrada = {
+    const mensagemStatus = {
         from: nome.name,
 		to: "Todos",
 		text: "entra na sala...",
 		type: "status",
 		time: Date.now()
     }
-    const entrada = axios.post("https://mock-api.driven.com.br/api/v6/uol/messages", mensagemEntrada);
+    const entrada = axios.post("https://mock-api.driven.com.br/api/v6/uol/messages", mensagemStatus);
 
     const conexao = setInterval(function() {
         const conexaoServidor = axios.post("https://mock-api.driven.com.br/api/v6/uol/status", nome);
@@ -55,4 +55,25 @@ function carregarMensagens(chatServidor) {
         }
     }
     chat.scrollIntoView(false);
+}
+
+function enviarMensagem() {
+    const mensagem = document.querySelector(".mensagem-enviada").value;
+    if (mensagem === "") {
+        return;
+    }
+    const mensagemNormal = {
+        from: nome.name,
+	    to: "Todos",
+	    text: mensagem,
+	    type: "message"
+    }
+    const mensagemEnviada = axios.post("https://mock-api.driven.com.br/api/v6/uol/messages", mensagemNormal);
+    mensagemEnviada.then(carregarMensagens);
+    mensagemEnviada.catch(sairDaSala);
+    document.querySelector(".mensagem-enviada").value = "";
+}
+
+function sairDaSala() {
+    window.location.reload()
 }
