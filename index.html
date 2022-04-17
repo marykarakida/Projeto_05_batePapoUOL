@@ -12,6 +12,17 @@
     <title>Bate Papo UOL</title>
 </head>
 <body>
+    <div class="tela-entrada">
+        <img class="logo" src="assets/images/bate-papo-uol-logo.png" alt="">
+        <div class="campo campo--input">
+            <input class="nome-enviado" type="text" placeholder="Digite seu nome">
+            <div class="enviar" onclick="perguntarNome()">Entrar</div>
+        </div>
+        <div class="campo campo--spinner escondido">
+            <img src="assets/images/spinner.gif" alt="">
+            <p>Entrando...</p>
+        </div>
+    </div>
     <div class="barra-topo">
         <img class="logo" src="assets/images/bate-papo-uol-logo.png" alt="" />
         <ion-icon class="contatos" onclick="mostrarContatos()" name="people"></ion-icon>
@@ -24,8 +35,8 @@
         </ul>
         <p>Escolha a visibilidade:</p>
         <ul class="visibilidade">
-            <li class="clicado" onclick="selecionarVisibilidade(this)"><ion-icon class="cadeado" name="lock-open"></ion-icon><span>Público</span><ion-icon class="check" name="checkmark"></ion-icon></li>
-            <li onclick="selecionarVisibilidade(this)"><ion-icon class="cadeado" name="lock-closed"></ion-icon><span>Reservadamente</span><ion-icon class="check" name="checkmark"></ion-icon></li>
+            <li class="publico clicado" onclick="selecionarVisibilidade(this)"><ion-icon class="cadeado" name="lock-open"></ion-icon><span>Público</span><ion-icon class="check" name="checkmark"></ion-icon></li>
+            <li class="reservado" onclick="selecionarVisibilidade(this)"><ion-icon class="cadeado" name="lock-closed"></ion-icon><span>Reservadamente</span><ion-icon class="check" name="checkmark"></ion-icon></li>
         </ul>
     </div>
     <ul class="chat">

@@ -1,46 +1,66 @@
 const nome = {};
+const nomeEnviado = document.querySelector(".nome-enviado");
+const mensagemEnviada = document.querySelector(".mensagem-enviada");
+let tempoUltimaMensagemRenderizada;
 let contatoSelecionado = "Todos";
 let visibilidadeSelecionado = "Pública";
 
-document.querySelector(".mensagem-enviada").value = "";
-perguntarNome();
+nomeEnviado.addEventListener("keyup", function(event) {
+  if (event.keyCode === 13) {
+    event.preventDefault();
+    document.querySelector(".tela-entrada .enviar").click();
+  }
+});
+mensagemEnviada.addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) {
+      event.preventDefault();
+      document.querySelector(".barra-inferior .enviar").click();
+    }
+});
 
 function perguntarNome() {
-    nome.name = prompt("Bem-vindo, usuário(a)! Digite seu nome para poder conversar com outros.");
+    nome.name = document.querySelector(".nome-enviado").value;
     conferirNome();
 }
-
 function conferirNome() {
     const nomeServidor = axios.post("https://mock-api.driven.com.br/api/v6/uol/participants", nome);
-    nomeServidor.then(manterConexao);
+    nomeServidor.then(entrarBatePapo);
     nomeServidor.catch(corrigirNome);
+    document.querySelector(".campo--input").classList.add("escondido");
+    document.querySelector(".campo--spinner").classList.remove("escondido");
 }
-
-function manterConexao() {
-    const conexao = setInterval(function() {
-        const conexaoServidor = axios.post("https://mock-api.driven.com.br/api/v6/uol/status", nome);
-    },5000);
-    const chat = setInterval(function() {
-        const chatServidor = axios.get("https://mock-api.driven.com.br/api/v6/uol/messages");
-        chatServidor.then(carregarMensagens);
-    },3000);
-    const contatos = setInterval(function() {
-        const contatosServidor = axios.get("https://mock-api.driven.com.br/api/v6/uol/participants");
-        contatosServidor.then(carregarContatos);
-    },10000);
-}
-
 function corrigirNome(erro) {
     if (erro.response.status === 400) {
         alert("Esse nome já está sendo usado!")
-        perguntarNome();
     }
 }
 
+function entrarBatePapo() {
+    document.querySelector(".tela-entrada").classList.add("escondido");
+
+    const postStatus = () => {const conexaoServidor = axios.post("https://mock-api.driven.com.br/api/v6/uol/status", nome)};
+    const conexao = setInterval(postStatus,5000);
+
+    const getMessages = () => {
+        const chatServidor = axios.get("https://mock-api.driven.com.br/api/v6/uol/messages");
+        chatServidor.then(carregarMensagens);
+    }
+    getMessages();
+    const chat = setInterval(getMessages,3000);
+
+    const getParticipantes = () => {
+        const contatosServidor = axios.get("https://mock-api.driven.com.br/api/v6/uol/participants");
+        contatosServidor.then(carregarContatos);
+    }
+    getParticipantes();
+    const contatos = setInterval(getParticipantes,10000);
+}
+
 function carregarMensagens(chatServidor) {
+    const chatLista = chatServidor.data;
+    let tempoUltimaMensagemServidor;
     const chat = document.querySelector(".chat");
     chat.innerHTML = ""
-    const chatLista = chatServidor.data;
     for (var i = 0; i < chatLista.length; i++) {
         if (chatLista[i].type === "status") {
             chat.innerHTML += `<li class="mensagem mensagem-de-status"><span class="relogio">${chatLista[i].time}</span> <span class="usuario">${chatLista[i].from}</span> ${chatLista[i].text}</li>`
@@ -49,9 +69,14 @@ function carregarMensagens(chatServidor) {
         } else if (chatLista[i].type === "private_message" && (chatLista[i].to === nome.name || chatLista[i].from === nome.name)) {
             chat.innerHTML += `<li class="mensagem mensagem-reservada"><span class="relogio">${chatLista[i].time}</span> <span class="usuario">${chatLista[i].from}</span> reservadamente para <span class="usuario">${chatLista[i].to}</span>: ${chatLista[i].text}</li>`
         }
+        if (i === chatLista.length - 1) {
+            tempoUltimaMensagemServidor = chatLista[i].time;
+        }
     }
-    // só scrollar se tiver mensagens novas, dá para guardar o data em outra variável e compara se os dois são diferentes, se for scrolla
-    chat.scrollIntoView(false);
+    if (tempoUltimaMensagemRenderizada !== tempoUltimaMensagemServidor) {
+        document.querySelector(".chat").scrollIntoView(false);
+    }
+    tempoUltimaMensagemRenderizada = tempoUltimaMensagemServidor;
 }
 
 function carregarContatos(contatosServidor) {
@@ -98,12 +123,16 @@ function enviarMensagem() {
 	    type: tipo
     }
     const mensagemEnviada = axios.post("https://mock-api.driven.com.br/api/v6/uol/messages", mensagemNormal);
-    mensagemEnviada.then(carregarMensagens);
-    mensagemEnviada.catch(sairDaSala);
+    const chatServidor = axios.get("https://mock-api.driven.com.br/api/v6/uol/messages");
+    chatServidor.then(carregarMensagens);
+    chatServidor.catch(sairDaSala);
     document.querySelector(".mensagem-enviada").value = "";
 }
 
 function sairDaSala() {
+    // rever se funciona mesmo
+    document.querySelector(".nome-enviado").value = "";
+    document.querySelector(".mensagem-enviada").value = "";
     window.location.reload()
 }
 
@@ -119,6 +148,17 @@ function selecionarContato(elemento) {
     }
     elemento.classList.add("clicado");
     contatoSelecionado = elemento.querySelector("span").innerHTML;
+    mudarVisibilidadeContatos (contatoSelecionado)
+}
+
+function mudarVisibilidadeContatos(contatoSelecionado) {
+    if(contatoSelecionado === "Todos") {
+        const visibilidade = document.querySelector(".publico");
+        selecionarVisibilidade(visibilidade);
+    } else if (contatoSelecionado === nome.name) {
+        const visibilidade = document.querySelector(".reservado");
+        selecionarVisibilidade(visibilidade);
+    }
     enviarMensagemPrivada();
 }
 
@@ -132,8 +172,6 @@ function selecionarVisibilidade(elemento) {
     enviarMensagemPrivada();
 }
 
-//se selecionou contato para enviar mensagem privada, mas ela sair antes de enviar contato, tem que tirar o texto
-// ou se enviar o texto dar erro
 function enviarMensagemPrivada() {
     if (visibilidadeSelecionado === "Reservadamente" && contatoSelecionado !== "Todos") {
         document.querySelector(".destinatario").innerHTML = `Enviando para ${contatoSelecionado} (reservadamente)`
