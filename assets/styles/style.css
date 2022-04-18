@@ -141,6 +141,14 @@ input:focus::placeholder {
 .contatos-lista ion-icon {
     margin-right: 10px;
 }
+.contatos-nomes {
+    overflow: scroll;
+    -ms-overflow-style: none; 
+    scrollbar-width: none; 
+}
+.contatos-nomes::-webkit-scrollbar {
+    display: none;
+}
 .todos {
     height: 18px;
     min-width: 24px;

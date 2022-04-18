@@ -3,7 +3,7 @@ const nomeEnviado = document.querySelector(".nome-enviado");
 const mensagemEnviada = document.querySelector(".mensagem-enviada");
 let tempoUltimaMensagemRenderizada;
 let contatoSelecionado = "Todos";
-let visibilidadeSelecionado = "Pública";
+let visibilidadeSelecionado = "Público";
 
 document.querySelector(".nome-enviado").value = "";
 document.querySelector(".mensagem-enviada").value = "";
@@ -46,7 +46,10 @@ function trocarTelaEntrada() {
 function entrarBatePapo() {
     document.querySelector(".tela-entrada").classList.add("escondido");
 
-    const postStatus = () => {const conexaoServidor = axios.post("https://mock-api.driven.com.br/api/v6/uol/status", nome)};
+    const postStatus = () => {
+        const conexaoServidor = axios.post("https://mock-api.driven.com.br/api/v6/uol/status", nome);
+        conexaoServidor.catch(sairDaSala);
+    };
     const conexao = setInterval(postStatus,5000);
 
     const getMessages = () => {
@@ -71,11 +74,11 @@ function carregarMensagens(chatServidor) {
     chat.innerHTML = ""
     for (var i = 0; i < chatLista.length; i++) {
         if (chatLista[i].type === "status") {
-            chat.innerHTML += `<li class="mensagem mensagem-de-status"><span class="relogio">${chatLista[i].time}</span> <span class="usuario">${chatLista[i].from}</span> ${chatLista[i].text}</li>`
+            chat.innerHTML += `<li class="mensagem mensagem-de-status"><span class="relogio">(${chatLista[i].time})</span> <span class="usuario">${chatLista[i].from}</span> ${chatLista[i].text}</li>`
         } else if (chatLista[i].type === "message") {
-            chat.innerHTML += `<li class="mensagem mensagem-normal"><span class="relogio">${chatLista[i].time}</span> <span class="usuario">${chatLista[i].from}</span> para <span class="usuario">${chatLista[i].to}</span>: ${chatLista[i].text}</li>`
+            chat.innerHTML += `<li class="mensagem mensagem-normal"><span class="relogio">(${chatLista[i].time})</span> <span class="usuario">${chatLista[i].from}</span> para <span class="usuario">${chatLista[i].to}</span>: ${chatLista[i].text}</li>`
         } else if (chatLista[i].type === "private_message" && (chatLista[i].to === nome.name || chatLista[i].from === nome.name)) {
-            chat.innerHTML += `<li class="mensagem mensagem-reservada"><span class="relogio">${chatLista[i].time}</span> <span class="usuario">${chatLista[i].from}</span> reservadamente para <span class="usuario">${chatLista[i].to}</span>: ${chatLista[i].text}</li>`
+            chat.innerHTML += `<li class="mensagem mensagem-reservada"><span class="relogio">(${chatLista[i].time})</span> <span class="usuario">${chatLista[i].from}</span> reservadamente para <span class="usuario">${chatLista[i].to}</span>: ${chatLista[i].text}</li>`
         }
         if (i === chatLista.length - 1) {
             tempoUltimaMensagemServidor = chatLista[i].time;
@@ -90,7 +93,6 @@ function carregarMensagens(chatServidor) {
 function carregarContatos(contatosServidor) {
     const contatos = document.querySelector(".contatos-nomes");
     const contatosLista = contatosServidor.data;
-    contatos.innerHTML = `<li class="clicado" onclick="selecionarContato(this)"><ion-icon class="todos" name="people"></ion-icon><span>Todos</span><ion-icon class="check" name="checkmark"></ion-icon></li>`;
     let usuarioDesconectado = true;
     for (var i = 0; i < contatosLista.length; i++) {
         if (contatoSelecionado === contatosLista[i].name) {
@@ -98,7 +100,9 @@ function carregarContatos(contatosServidor) {
             usuarioDesconectado = false;
         }
         if (i === contatosLista.length - 1 && usuarioDesconectado) {
+            contatos.innerHTML = `<li class="clicado" onclick="selecionarContato(this)"><ion-icon class="todos" name="people"></ion-icon><span>Todos</span><ion-icon class="check" name="checkmark"></ion-icon></li>`;
             contatoSelecionado = "Todos";
+            mudarVisibilidadeContatos()
         }    
     }
     for (var i = 0; i < contatosLista.length; i++) {
@@ -118,7 +122,7 @@ function enviarMensagem() {
     }
     let tipo = "";
     switch(visibilidadeSelecionado) {
-        case "Pública":
+        case "Público":
             tipo = "message";
             break;
         case "Reservadamente":
@@ -153,17 +157,7 @@ function selecionarContato(elemento) {
     }
     elemento.classList.add("clicado");
     contatoSelecionado = elemento.querySelector("span").innerHTML;
-    mudarVisibilidadeContatos (contatoSelecionado)
-}
-
-function mudarVisibilidadeContatos(contatoSelecionado) {
-    if(contatoSelecionado === "Todos") {
-        const visibilidade = document.querySelector(".publico");
-        selecionarVisibilidade(visibilidade);
-    } else if (contatoSelecionado === nome.name) {
-        const visibilidade = document.querySelector(".reservado");
-        selecionarVisibilidade(visibilidade);
-    }
+    mudarVisibilidadeContatos();
     enviarMensagemPrivada();
 }
 
@@ -174,7 +168,18 @@ function selecionarVisibilidade(elemento) {
     }
     elemento.classList.add("clicado");
     visibilidadeSelecionado = elemento.querySelector("span").innerHTML;
+    mudarVisibilidadeContatos();
     enviarMensagemPrivada();
+}
+
+function mudarVisibilidadeContatos() {
+    if (contatoSelecionado === "Todos" && visibilidadeSelecionado === "Reservadamente") {
+        const visibilidade = document.querySelector(".publico");
+        selecionarVisibilidade(visibilidade);
+    } else if (contatoSelecionado === nome.name && visibilidadeSelecionado === "Público") {
+        const visibilidade = document.querySelector(".reservado");
+        selecionarVisibilidade(visibilidade);
+    }
 }
 
 function enviarMensagemPrivada() {
