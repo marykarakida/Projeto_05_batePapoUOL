@@ -5,6 +5,9 @@ let tempoUltimaMensagemRenderizada;
 let contatoSelecionado = "Todos";
 let visibilidadeSelecionado = "Pública";
 
+document.querySelector(".nome-enviado").value = "";
+document.querySelector(".mensagem-enviada").value = "";
+
 nomeEnviado.addEventListener("keyup", function(event) {
   if (event.keyCode === 13) {
     event.preventDefault();
@@ -26,13 +29,18 @@ function conferirNome() {
     const nomeServidor = axios.post("https://mock-api.driven.com.br/api/v6/uol/participants", nome);
     nomeServidor.then(entrarBatePapo);
     nomeServidor.catch(corrigirNome);
-    document.querySelector(".campo--input").classList.add("escondido");
-    document.querySelector(".campo--spinner").classList.remove("escondido");
+    trocarTelaEntrada();
 }
 function corrigirNome(erro) {
     if (erro.response.status === 400) {
-        alert("Esse nome já está sendo usado!")
+        let campoErro = document.querySelector(".campo--erro");
+        campoErro.innerHTML = `<p>Esse nome já está sendo usado</p>`
     }
+    trocarTelaEntrada();
+}
+function trocarTelaEntrada() {
+    document.querySelector(".campo--input").classList.toggle("escondido");
+    document.querySelector(".campo--spinner").classList.toggle("escondido");
 }
 
 function entrarBatePapo() {
@@ -130,9 +138,6 @@ function enviarMensagem() {
 }
 
 function sairDaSala() {
-    // rever se funciona mesmo
-    document.querySelector(".nome-enviado").value = "";
-    document.querySelector(".mensagem-enviada").value = "";
     window.location.reload()
 }
 
